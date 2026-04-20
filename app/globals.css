@@ -787,10 +787,10 @@ section.rsvp .motif--pale { color: #5e5272; }
 
 .cover-lavender {
   position: absolute;
-  bottom: -30px;
-  right: -30px;
-  width: 260px;
-  height: 440px;
+  bottom: -10px;
+  right: -10px;
+  width: 160px;
+  height: 288px;
   color: var(--rose-deep);
   opacity: 0;
   animation: lavenderIn 1200ms cubic-bezier(.2,.7,.2,1) 400ms forwards;
@@ -800,7 +800,7 @@ section.rsvp .motif--pale { color: #5e5272; }
 .cover-lavender svg { width: 100%; height: 100%; }
 @keyframes lavenderIn {
   from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: .7; transform: translateY(0); }
+  to   { opacity: .25; transform: translateY(0); }
 }
 
 .cover-center {
