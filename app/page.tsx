@@ -69,9 +69,10 @@ const I = {
       <circle cx="9" cy="14" r="5" /><circle cx="16" cy="10" r="4" />
     </svg>
   ),
-  glass: (
+  dining: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M7 3h10l-1 7a4 4 0 0 1-8 0L7 3z" /><path d="M12 14v6" /><path d="M8 20h8" />
+      <path d="M3 3v6c0 2.2 1.8 4 4 4v8" /><path d="M7 3v4" /><path d="M5 3v4" />
+      <path d="M21 3c-2 0-4 2-4 6s2 6 4 6V3z" /><path d="M17 13v6" />
     </svg>
   ),
   camera: (
@@ -271,7 +272,7 @@ function Hero() {
             <div className="hero-date-strip">
               <span>Saturday</span>
               <span className="hero-date-rule" />
-              <span>30 May 2026</span>
+              <span>30th May 2026</span>
             </div>
           </div>
         </div>
@@ -359,7 +360,7 @@ function Countdown() {
       <Reveal variant="zoom"><span className="icon" aria-hidden="true">{I.clock}</span></Reveal>
       <Reveal variant="up-sm" delay={100}><h2 className="section-title">The Countdown</h2></Reveal>
       <Reveal variant="up-sm" delay={200}>
-        <p className="lede">Every tick brings us closer to the moment we say <em>I do</em>. Save 30 May and celebrate with us.</p>
+        <p className="lede">Every tick brings us closer to the moment we say <em>I do</em>. Save the 30th May and celebrate with us.</p>
       </Reveal>
       <div className="count-grid" role="timer" aria-label="Time until wedding">
         <Reveal variant="up" delay={300}><div className="count-cell"><div className="count-num">{pad(days)}</div><div className="count-lbl">Days</div></div></Reveal>
@@ -391,7 +392,7 @@ function ItineraryBlock({ icon, title, time, address }: {
   address: string
 }) {
   return (
-    <div className="itin-block" style={{ marginTop: 20 }}>
+    <div className="itin-block" style={{ marginTop: 60 }}>
       <span className="icon" aria-hidden="true">{icon}</span>
       <h3 className="block-title">{title}</h3>
       <div className="info-line">{time}</div>
@@ -415,13 +416,13 @@ function Itinerary() {
         <ItineraryBlock
           icon={I.rings}
           title="Solemnisation"
-          time="1:00 PM · Saturday, 30 May 2026"
+          time="1:00 PM · Saturday, 30th May 2026"
           address="Solemnisation Ceremony"
         />
       </Reveal>
       <Reveal variant="up" delay={300}>
         <ItineraryBlock
-          icon={I.glass}
+          icon={I.dining}
           title="Reception"
           time="6:00 PM onwards · Dinner & Celebration"
           address="Evening Reception"
@@ -452,7 +453,7 @@ function Itinerary() {
 // ---------- Gallery ----------
 const GALLERY_ITEMS: { src?: string; label: string }[] = [
   { src: '/images/1.jpeg', label: 'Photo 1' },
-  { src: '/images/2.jpeg', label: 'Photo 2' },
+  // { src: '/images/2.jpeg', label: 'Photo 2' },
   { src: '/images/3.jpeg', label: 'Photo 3' },
   { src: '/images/4.jpeg', label: 'Photo 4' },
 ]
@@ -744,6 +745,7 @@ function Cover({ opening, onOpen }: { opening: boolean; onOpen: () => void }) {
 export default function Page() {
   const [coverOpening, setCoverOpening] = useState(false)
   const [coverRemoved, setCoverRemoved] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     if (coverRemoved) return
@@ -754,12 +756,32 @@ export default function Page() {
 
   const openInvite = () => {
     if (coverOpening) return
+    const audio = audioRef.current
+    if (audio) {
+      audio.volume = 0
+      const p = audio.play()
+      if (p && typeof p.then === 'function') p.catch(() => {})
+      let v = 0
+      const target = 0.45
+      const fade = setInterval(() => {
+        v = Math.min(target, v + 0.03)
+        audio.volume = v
+        if (v >= target) clearInterval(fade)
+      }, 80)
+    }
     setCoverOpening(true)
     setTimeout(() => setCoverRemoved(true), 1300)
   }
 
   return (
     <div className="stage">
+      <audio
+        ref={audioRef}
+        src="/sounds/sparks.mp3"
+        preload="auto"
+        loop
+        aria-hidden="true"
+      />
       <div className="invite">
         {!coverRemoved && <Cover opening={coverOpening} onOpen={openInvite} />}
         <Hero />
@@ -767,8 +789,8 @@ export default function Page() {
         <Countdown />
         <Itinerary />
         <Gallery />
-        <RSVP />
         <Gifts />
+        <RSVP />
         <Footer />
       </div>
     </div>
