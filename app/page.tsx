@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 
 const WEDDING = new Date('2026-05-30T13:00:00')
 
@@ -385,18 +386,20 @@ function MapPlaceholder({ tag }: { tag: string }) {
   )
 }
 
-function ItineraryBlock({ icon, title, time, address }: {
+function ItineraryBlock({ icon, title, time, label, venue }: {
   icon: React.ReactNode
   title: string
   time: string
-  address: string
+  label: string
+  venue: string
 }) {
   return (
     <div className="itin-block" style={{ marginTop: 60 }}>
       <span className="icon" aria-hidden="true">{icon}</span>
       <h3 className="block-title">{title}</h3>
       <div className="info-line">{time}</div>
-      <div className="info-line" style={{ color: 'var(--ink-mute)', fontSize: 14 }}>{address}</div>
+      <div className="info-line" style={{ color: 'var(--ink-soft)', fontSize: 13, fontWeight: 600, letterSpacing: '.04em', marginTop: 6 }}>{label}</div>
+      <div className="info-line" style={{ color: 'var(--ink-mute)', fontSize: 13, marginTop: 2 }}>{venue}</div>
     </div>
   )
 }
@@ -417,7 +420,8 @@ function Itinerary() {
           icon={I.rings}
           title="Solemnisation"
           time="1:00 PM · Saturday, 30th May 2026"
-          address="Solemnisation Ceremony"
+          label="Solemnisation Ceremony"
+          venue="The Ratson Pavillion"
         />
       </Reveal>
       <Reveal variant="up" delay={300}>
@@ -425,7 +429,8 @@ function Itinerary() {
           icon={I.dining}
           title="Reception"
           time="6:00 PM onwards · Dinner & Celebration"
-          address="Evening Reception"
+          label="Evening Reception"
+          venue="The Ratson Pavillion"
         />
       </Reveal>
       <div style={{ marginTop: 80 }}></div>
@@ -646,86 +651,44 @@ function Footer() {
 }
 
 // ---------- Cover ----------
-const PETALS = Array.from({ length: 12 }, (_, i) => ({
-  left: `${8 + (i * 7.3) % 84}%`,
-  size: 6 + (i % 3) * 4,
-  delay: `${(i * 0.65) % 4.8}s`,
-  duration: `${7 + (i * 1.1) % 8}s`,
-  cls: i % 3 === 1 ? 'p2' : i % 3 === 2 ? 'p3' : '',
-}))
 
-function Cover({ opening, onOpen }: { opening: boolean; onOpen: () => void }) {
+function Cover({ opening, onOpen, name }: { opening: boolean; onOpen: () => void; name: string | null }) {
   return (
     <div className={`cover${opening ? ' is-opening' : ''}`} onClick={onOpen}>
-      <span className="cover-orb o1" aria-hidden="true" />
-      <span className="cover-orb o2" aria-hidden="true" />
-      <span className="cover-orb o3" aria-hidden="true" />
-      <div className="petals">
-        {PETALS.map((p, i) => (
-          <div
-            key={i}
-            className={`petal ${p.cls}`}
-            style={{
-              left: p.left,
-              top: '-20px',
-              width: p.size,
-              height: p.size,
-              animationDuration: p.duration,
-              animationDelay: p.delay,
-            }}
-          />
-        ))}
+      <div className="cover-photo">
+        <Image
+          src="/images/bg.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: 'cover', objectPosition: 'center top' }}
+        />
       </div>
-      <div className="card">
-        {/* Lavender sprig — bottom right */}
-        <div className="cover-lavender" aria-hidden="true">
-          <svg viewBox="0 0 200 360" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* Main stems */}
-            <path d="M100 360 C100 280, 95 220, 90 160 C86 120, 88 80, 92 40" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity=".7" />
-            <path d="M100 360 C105 300, 115 240, 125 180 C132 140, 130 100, 120 55" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity=".6" />
-            <path d="M100 360 C90 310, 75 260, 65 200 C58 160, 62 120, 72 70" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" opacity=".5" />
-            {/* Left stem buds */}
-            <ellipse cx="72" cy="70" rx="3.5" ry="6" transform="rotate(-15 72 70)" fill="currentColor" opacity=".65" />
-            <ellipse cx="68" cy="85" rx="3" ry="5.5" transform="rotate(-10 68 85)" fill="currentColor" opacity=".55" />
-            <ellipse cx="65" cy="100" rx="3" ry="5" transform="rotate(-8 65 100)" fill="currentColor" opacity=".5" />
-            <ellipse cx="63" cy="115" rx="2.5" ry="4.5" transform="rotate(-5 63 115)" fill="currentColor" opacity=".45" />
-            <ellipse cx="62" cy="130" rx="2.5" ry="4" transform="rotate(-3 62 130)" fill="currentColor" opacity=".4" />
-            <ellipse cx="63" cy="145" rx="2" ry="3.5" fill="currentColor" opacity=".35" />
-            {/* Center stem buds */}
-            <ellipse cx="92" cy="40" rx="4" ry="7" transform="rotate(-5 92 40)" fill="currentColor" opacity=".7" />
-            <ellipse cx="91" cy="55" rx="3.5" ry="6.5" transform="rotate(-3 91 55)" fill="currentColor" opacity=".65" />
-            <ellipse cx="90" cy="70" rx="3.5" ry="6" fill="currentColor" opacity=".6" />
-            <ellipse cx="89" cy="85" rx="3" ry="5.5" fill="currentColor" opacity=".55" />
-            <ellipse cx="89" cy="100" rx="3" ry="5" fill="currentColor" opacity=".5" />
-            <ellipse cx="89" cy="115" rx="2.5" ry="4.5" fill="currentColor" opacity=".45" />
-            <ellipse cx="90" cy="130" rx="2.5" ry="4" fill="currentColor" opacity=".4" />
-            {/* Right stem buds */}
-            <ellipse cx="120" cy="55" rx="4" ry="6.5" transform="rotate(10 120 55)" fill="currentColor" opacity=".65" />
-            <ellipse cx="123" cy="70" rx="3.5" ry="6" transform="rotate(12 123 70)" fill="currentColor" opacity=".6" />
-            <ellipse cx="125" cy="85" rx="3" ry="5.5" transform="rotate(10 125 85)" fill="currentColor" opacity=".55" />
-            <ellipse cx="126" cy="100" rx="3" ry="5" transform="rotate(8 126 100)" fill="currentColor" opacity=".5" />
-            <ellipse cx="126" cy="115" rx="2.5" ry="4.5" transform="rotate(5 126 115)" fill="currentColor" opacity=".45" />
-            <ellipse cx="125" cy="130" rx="2.5" ry="4" fill="currentColor" opacity=".4" />
-            {/* Scattered small buds */}
-            <ellipse cx="78" cy="58" rx="2.5" ry="4.5" transform="rotate(-12 78 58)" fill="currentColor" opacity=".5" />
-            <ellipse cx="108" cy="48" rx="3" ry="5" transform="rotate(8 108 48)" fill="currentColor" opacity=".55" />
-            <ellipse cx="112" cy="65" rx="2.5" ry="4" transform="rotate(6 112 65)" fill="currentColor" opacity=".45" />
-            {/* Leaf shapes on stems */}
-            <path d="M88 180 C80 170, 72 175, 78 185 C82 190, 88 185, 88 180z" fill="currentColor" opacity=".25" />
-            <path d="M122 160 C130 150, 138 155, 132 165 C128 170, 122 165, 122 160z" fill="currentColor" opacity=".2" />
-            <path d="M70 170 C62 162, 55 168, 62 176 C66 180, 70 175, 70 170z" fill="currentColor" opacity=".18" />
-          </svg>
+      {/* <div className="cover-badge" aria-hidden="true">
+        <span className="badge-rule" />
+        <span className="badge-label">You&apos;re invited</span>
+        <span className="badge-rule" />
+      </div> */}
+
+      
+
+      <div className="cover-content">
+
+        <div className="cover-message">
+          <p className="msg-greeting">Dear {name && name.trim() ? name : 'Friend'},</p>
+          <p className="msg-body">
+            With joyful hearts, we invite you<br />
+            to witness the vows that will bind us forever.
+          </p>
         </div>
 
-        <div />
-
-        <div className="cover-center">
-          <div className="cover-names">
-            <span className="line a">Robert</span>
-            <span className="line amp">&amp;</span>
-            <span className="line b">Matti</span>
-          </div>
+        <div className="cover-names">
+          <span className="line a">Robert</span>
+          <span className="line amp">&amp;</span>
+          <span className="line b">Matti</span>
         </div>
+
 
         <div className="cover-cta">
           <button
@@ -743,6 +706,16 @@ function Cover({ opening, onOpen }: { opening: boolean; onOpen: () => void }) {
 
 // ---------- Page ----------
 export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <PageContent />
+    </Suspense>
+  )
+}
+
+function PageContent() {
+  const searchParams = useSearchParams()
+  const guestName = searchParams.get('name')
   const [coverOpening, setCoverOpening] = useState(false)
   const [coverRemoved, setCoverRemoved] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -783,7 +756,7 @@ export default function Page() {
         aria-hidden="true"
       />
       <div className="invite">
-        {!coverRemoved && <Cover opening={coverOpening} onOpen={openInvite} />}
+        {!coverRemoved && <Cover opening={coverOpening} onOpen={openInvite} name={guestName} />}
         <Hero />
         <Header />
         <Countdown />
