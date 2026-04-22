@@ -661,6 +661,7 @@ function Cover({ opening, onOpen, name }: { opening: boolean; onOpen: () => void
           alt=""
           fill
           priority
+          fetchPriority="high"
           sizes="100vw"
           style={{ objectFit: 'cover', objectPosition: 'center top' }}
         />

@@ -30,11 +30,26 @@ export default function SharePage() {
     window.open(link, '_blank', 'noopener')
   }
 
-  const shareWhatsApp = () => {
-    const message = trimmed
-      ? `Dear ${trimmed}, you're warmly invited to Robert & Matti's wedding. Open your invitation: ${link}`
-      : `You're warmly invited to Robert & Matti's wedding. Open the invitation: ${link}`
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener')
+  const share = async () => {
+    const text = trimmed
+      ? `Dear ${trimmed}, you're warmly invited to Robert & Matti's wedding.`
+      : `You're warmly invited to Robert & Matti's wedding.`
+    const data: ShareData = {
+      title: "Robert & Matti — Wedding Invitation",
+      text,
+      url: link,
+    }
+    try {
+      if (navigator.share) {
+        await navigator.share(data)
+      } else {
+        await navigator.clipboard.writeText(`${text} ${link}`)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1800)
+      }
+    } catch {
+      // user cancelled or share unsupported
+    }
   }
 
   const greetingName = trimmed || 'Friend'
@@ -89,8 +104,8 @@ export default function SharePage() {
           <button onClick={openPreview} style={styles.ghostBtn}>
             Open preview
           </button>
-          <button onClick={shareWhatsApp} style={styles.whatsappBtn}>
-            Share via WhatsApp
+          <button onClick={share} style={styles.shareBtn}>
+            Share
           </button>
         </div>
       </div>
@@ -234,10 +249,10 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     fontFamily: 'system-ui, sans-serif',
   },
-  whatsappBtn: {
+  shareBtn: {
     flex: '1 1 100%',
     padding: '13px 16px',
-    background: '#25D366',
+    background: '#2d2630',
     color: '#fff',
     border: 'none',
     fontSize: 12,

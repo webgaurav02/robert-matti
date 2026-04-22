@@ -81,6 +81,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${italiana.variable} ${inter.variable}`}>
+      <head>
+        <link
+          rel="preload"
+          as="image"
+          href="/images/bg.jpg"
+          fetchPriority="high"
+        />
+      </head>
       <body>{children}</body>
     </html>
   )
